@@ -256,7 +256,7 @@
       this.type = type;
       this.score = score[type].slice(0);
       this.x = KeyButton.getDefaultX(KeyButton.TYPE_INDEX[type]) - KeyButton.RADIUS;
-      this.y = -KeyButton.RADIUS;
+      this.y = -KeyButton.RADIUS - KeyButton.STROKE_WIDTH;
       this.JUST_Y = KeyButton.DEFAULT_Y;
       var sel=this;
       window.addEventListener('keydown' , function (e) {
@@ -326,7 +326,7 @@
     draw: function (canvas) {
       var c = canvas.context;
       if (!this.score.length) return;
-      var SIZE = KeyButton.RADIUS * 2;
+      var SIZE = KeyButton.RADIUS * 2 + KeyButton.STROKE_WIDTH;
       var image = this.__image;
       var score = this.score;
       var JUST_Y = this.JUST_Y;
@@ -360,8 +360,8 @@
         fill: kp.fill.slice(0, -4) + '1)',
         stroke: kp.stroke,
         radius:KeyButton.RADIUS,
-        strokeWidth: 4,//KeyButton.STROKE_WIDTH,
-        padding: 0,
+        strokeWidth: KeyButton.STROKE_WIDTH,
+        padding:KeyButton.STROKE_WIDTH / 2,
         shadow:true,
       });
       this.superInit(param);
