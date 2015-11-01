@@ -256,7 +256,7 @@
       this.type = type;
       this.score = score[type].slice(0);
       this.x = KeyButton.getDefaultX(KeyButton.TYPE_INDEX[type]) - KeyButton.RADIUS;
-      this.y = -38;
+      this.y = -KeyButton.RADIUS;
       this.JUST_Y = KeyButton.DEFAULT_Y;
       var sel=this;
       window.addEventListener('keydown' , function (e) {
