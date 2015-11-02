@@ -16,15 +16,15 @@
    * @param   {String} key name
    * @param   {Object} param
    */
-  Object.defineProperty(Object.prototype, "property", {
-    value: function(name, val) {
-      Object.defineProperty(this, name, {
-        value: val,
-        enumerable: true,
-        writable: true
-      });
-    }
-  });
+  // Object.defineProperty(Object.prototype, "property", {
+  //   value: function(name, val) {
+  //     Object.defineProperty(this, name, {
+  //       value: val,
+  //       enumerable: true,
+  //       writable: true
+  //     });
+  //   }
+  // });
 
   /**
    * @method method
@@ -3700,6 +3700,10 @@ phina.namespace(function() {
    */
   phina.define('phina.asset.Sound', {
     superClass: "phina.asset.Asset",
+    
+    _loop: false,
+    _loopStart: 0,
+    _loopEnd: 0,
 
     /**
      * @constructor
@@ -3707,16 +3711,7 @@ phina.namespace(function() {
     init: function() {
       this.superInit();
       this.context = phina.asset.Sound.audioContext;
-    },
-
-    /**
-     * 複製
-     */
-    clone: function() {
-      var sound = phina.asset.Sound();
-      sound.loadFromBuffer(this.buffer);
-      sound.volume = this.volume;
-      return sound;
+      this.gainNode = this.context.createGain();
     },
 
     play: function() {
@@ -3726,8 +3721,13 @@ phina.namespace(function() {
 
       this.source = this.context.createBufferSource();
       this.source.buffer = this.buffer;
+      this.source.loop = this._loop;
+      this.source.loopStart = this._loopStart;
+      this.source.loopEnd = this._loopEnd;
+
       // connect
-      this.source.connect(this.context.destination);
+      this.source.connect(this.gainNode);
+      this.gainNode.connect(this.context.destination);
       // play
       this.source.start(0);
 
@@ -3783,6 +3783,19 @@ phina.namespace(function() {
       this.buffer = buffer;
     },
 
+    setLoop: function(loop) {
+      this.loop = loop;
+      return this;
+    },
+    setLoopStart: function(loopStart) {
+      this.loopStart = loopStart;
+      return this;
+    },
+    setLoopEnd: function(loopEnd) {
+      this.loopEnd = loopEnd;
+      return this;
+    },
+
     _load: function(r) {
       var self = this;
 
@@ -3809,6 +3822,34 @@ phina.namespace(function() {
 
       xml.responseType = 'arraybuffer';
       xml.send(null);
+    },
+
+    _accessor: {
+      volume: {
+        get: function()  { return this.gainNode.gain.value; },
+        set: function(v) { this.gainNode.gain.value = v; },
+      },
+      loop: {
+        get: function()  { return this._loop; },
+        set: function(v) {
+          this._loop = v;
+          if (this.source) this.source._loop = v;
+        },
+      },
+      loopStart: {
+        get: function()  { return this._loopStart; },
+        set: function(v) {
+          this._loopStart = v;
+          if (this.source) this.source._loopStart = v;
+        },
+      },
+      loopEnd: {
+        get: function()  { return this._loopEnd; },
+        set: function(v) {
+          this._loopEnd = v;
+          if (this.source) this.source._loopEnd = v;
+        },
+      },
     },
 
     _static: {
@@ -5728,6 +5769,25 @@ phina.namespace(function() {
         document.body.appendChild(script);
         script.onload = function() {
           this.enableStats();
+        }.bind(this);
+      }
+      return this;
+    },
+
+    enableDatGUI: function(callback) {
+      if (phina.global.dat) {
+        var gui = new phina.global.dat.GUI();
+        callback(gui);
+      }
+      else {
+        // console.warn("not defined dat.GUI.");
+        var URL = 'https://cdnjs.cloudflare.com/ajax/libs/dat-gui/0.5.1/dat.gui.js';
+        var script = document.createElement('script');
+        script.src = URL;
+        document.body.appendChild(script);
+        script.onload = function() {
+          var gui = new phina.global.dat.GUI();
+          callback(gui);
         }.bind(this);
       }
       return this;
@@ -8401,13 +8461,13 @@ phina.namespace(function() {
       var srcRect = this.srcRect;
       canvas.context.drawImage(image,
         srcRect.x, srcRect.y, srcRect.width, srcRect.height,
-        -this.width*this.originX, -this.height*this.originY, this.width, this.height
+        -this._width*this.originX, -this._height*this.originY, this._width, this._height
         );
     },
 
     setFrameIndex: function(index, width, height) {
-      var tw  = width || this.width;      // tw
-      var th  = height || this.height;    // th
+      var tw  = width || this._width;      // tw
+      var th  = height || this._height;    // th
       var row = ~~(this.image.domElement.width / tw);
       var col = ~~(this.image.domElement.height / th);
       var maxIndex = row*col;
