@@ -41,9 +41,11 @@
     }
   };
   var window = phina.global;
-
+  // localize
   var display = phina.display;
   var Label = display.Label;
+  var ui = phina.ui;
+  var Button = ui.Button;
   var CanvasElement = display.CanvasElement;
   var context = phina.asset.Sound.audioContext;
   var assetManager = phina.asset.AssetManager;
@@ -61,7 +63,7 @@
     none: 0.2,
   };
   var settings = {
-    rotate: 'left', //どこがした
+    rotate: 'bottom', //どこがした
     getTransformRotate: function() {
       return this._rotateMap[this.rotate];
     },
@@ -234,7 +236,7 @@
 
     app.pushScene(phina.game.LoadingScene(SCENE_ARGUMENTS).on('exit', function() {
       KeyButton.SE = [sounds.se, sounds.snare, sounds.se, sounds.snare, sounds.se];
-      app.replaceScene(GameScene());
+      app.replaceScene(SettingScene());
     }));
     app.run();
   });
@@ -259,6 +261,7 @@
     init: function() {
       this.superInit(SCENE_ARGUMENTS);
       settings.refresh();
+      var menu = MenuDialog(this._static.settingTree).addChildTo(this);
     },
     //onenter: function() {
     //  this.app.replaceScene(GameScene());
@@ -270,14 +273,34 @@
       settingTree: {
         index: [
           "ゲームスタート",
-          '音量'
+          '画面の回転',
+          '音量設定'
         ],
         
+        '画面の回転': {
+          index: ["左", '右', "上", '下(回転なし)'],
+          "左": function() {
+            settings.rotate = 'left';
+            settings.refresh();
+          },
+          '右': function() {
+            settings.rotate = 'right';
+            settings.refresh();
+          },
+          "上": function() {
+            settings.rotate = 'top';
+            settings.refresh();
+          },
+          '下(回転なし)': function() {
+            settings.rotate = 'bottom';
+            settings.refresh();
+          },
+        },
         "ゲームスタート": function() {
           app.replaceScene(GameScene());
         },
 
-        "音量": {
+        "音量設定": {
           "BGM": false,
           "効果音": false,
           index: ["BGM","効果音"]
@@ -290,9 +313,86 @@
   var MenuDialog = phina.define('', {
     superClass: phina.display.CanvasElement,
 
+    dialogGroup: null,
+    currentMenu: null,
+
     init: function(menu) {
       this.superInit();
       this.menu = menu;
+      var self = this;
+      var currentMenu = this.currentMenu = menu;
+      var group = this.dialogGroup = CanvasElement().addChildTo(this);
+      var createMenu = this.createMenu = function(k, parentMenu, menu, i, group) {
+        menu.parent = parentMenu;
+        if (menu.index) {
+          Button({
+            text: k,
+            fontSize: 24,
+            width: SCREEN_WIDTH * 0.5,
+            height: 30,
+          }).addChildTo(group)
+            .setPosition(SCREEN_WIDTH / 2, (i + 1) * 35)
+            .on('pointend', function() {
+              this.parent.remove();
+              self.currentMenu = menu;
+              var group = self.dialogGroup = CanvasElement().addChildTo(self);
+              var j = 0;
+              menu.index.forEach(function(k, i) {
+                createMenu(k, menu, menu[k], j = i, group);
+              });
+              self.createBackButton(j + 1, group);
+
+          });
+        } else {
+          var _k = k;
+          if (!menu) {
+            _k = k + "(未実装)";
+            menu = function() { };
+          }
+          Button({
+            text: _k,
+            fontSize: 24,
+            width: SCREEN_WIDTH * 0.5,
+            height: 30,
+          }).setPosition(SCREEN_WIDTH / 2, (i + 1) * 35)
+            .addChildTo(group)
+            .on('pointend', menu);
+
+        }
+      };
+      menu.index.forEach(function(k, i) {
+        createMenu(k, menu, menu[k], i, group);
+      });
+
+    },
+    createMenu: function() { },
+
+    createBackButton: function(i, group) {
+      var self = this;
+      return Button({
+        text: '戻る',
+        fontSize: 24,
+        height: 30,
+        fill:'green',
+        width: SCREEN_WIDTH * 0.5,
+      })
+        .addChildTo(group).
+        setPosition(SCREEN_WIDTH / 2, (i + 1) * 35)
+      .on('pointend', function() {
+        self.backDialog();
+      });
+      return this;
+    },
+
+    backDialog: function() {
+      var self = this;
+      this.dialogGroup.remove();
+      var group = this.dialogGroup = CanvasElement().addChildTo(this);
+      var current = this.currentMenu = this.currentMenu.parent;
+      current.index.forEach(function(k, i) {
+        self.createMenu(k, current, current[k], i, group);
+      });
+      return this;
     },
   });
 
