@@ -268,6 +268,7 @@
     init: function() {
       this.superInit(SCENE_ARGUMENTS);
       settings.refresh();
+      Label(VERSION).setPosition(10, 20).addChildTo(this).align='left';
       var menu = MenuDialog(this._static.settingTree).addChildTo(this);
     },
     //onenter: function() {
