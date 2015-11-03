@@ -29,7 +29,7 @@
   描画の更新はUPDATEで行う。
 
   */
-  var VERSION = '0.0.9';
+  var VERSION = '0.0.10';
 
   var SCREEN_WIDTH = 480;
   var SCREEN_HEIGHT = 320;
