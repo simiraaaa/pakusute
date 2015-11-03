@@ -4412,35 +4412,35 @@ phina.namespace(function() {
       this.touches = [];
       this.stockes = [];
 
-      //(length).times(function() {
-      //  var touch = phina.input.Touch(domElement, true);
-      //  touch.id = null;
-      //  this.stockes.push(touch);
-      //}, this);
+      (length).times(function() {
+        var touch = phina.input.Touch(domElement, true);
+        touch.id = null;
+        this.stockes.push(touch);
+      }, this);
 
-      //var self = this;
-      //this.domElement.addEventListener('touchstart', function(e) {
-      //  Array.prototype.forEach.call(e.changedTouches, function(t) {
-      //    var touch = self.getEmpty();
+      var self = this;
+      this.domElement.addEventListener('touchstart', function(e) {
+        Array.prototype.forEach.call(e.changedTouches, function(t) {
+          var touch = self.getEmpty();
 
-      //    touch.id = t.identifier;
-      //    touch._start(t.pointX, t.pointY);
-      //  });
-      //});
+          touch.id = t.identifier;
+          touch._start(t.pointX, t.pointY);
+        });
+      });
 
-      //this.domElement.addEventListener('touchend', function(e) {
-      //  Array.prototype.forEach.call(e.changedTouches, function(t) {
-      //    var touch = self.getTouch(t.identifier);
-      //    touch._end();
-      //  });
-      //});
-      //this.domElement.addEventListener('touchmove', function(e) {
-      //  Array.prototype.forEach.call(e.changedTouches, function(t) {
-      //    var touch = self.getTouch(t.identifier);
-      //    touch._move(t.pointX, t.pointY);
-      //  });
-      //  e.stop();
-      //});
+      this.domElement.addEventListener('touchend', function(e) {
+        Array.prototype.forEach.call(e.changedTouches, function(t) {
+          var touch = self.getTouch(t.identifier);
+          touch._end();
+        });
+      });
+      this.domElement.addEventListener('touchmove', function(e) {
+        Array.prototype.forEach.call(e.changedTouches, function(t) {
+          var touch = self.getTouch(t.identifier);
+          touch._move(t.pointX, t.pointY);
+        });
+        e.stop();
+      });
     },
 
     getEmpty: function() {
@@ -8930,7 +8930,7 @@ phina.namespace(function() {
 
       this.mouse = phina.input.Mouse(this.domElement);
       this.touch = phina.input.Touch(this.domElement);
-      this.touchList = phina.input.TouchList(this.domElement, 5);
+      this.touchList = phina.input.TouchList(this.domElement, 10);
       this.keyboard = phina.input.Keyboard(document);
 
       // ポインタをセット(PC では Mouse, Mobile では Touch)
