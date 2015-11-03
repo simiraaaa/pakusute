@@ -29,7 +29,7 @@
   描画の更新はUPDATEで行う。
 
   */
-  var VERSION = '0.0.6';
+  var VERSION = '0.0.7';
 
   var SCREEN_WIDTH = 480;
   var SCREEN_HEIGHT = 320;
@@ -41,6 +41,13 @@
     }
   };
   var window = phina.global;
+  window.onerror = function(a,b,c,d,e) {
+    alert(a);
+    alert(b);
+    alert(c);
+    alert(d);
+    alert(JSON.stringify(e));
+  };
   // localize
   var display = phina.display;
   var Label = display.Label;
@@ -427,7 +434,7 @@
         fill: 'white',
         baseline:'top',
       })
-      .setPosition(20, 20)
+      .setPosition(20, 60)
       .addChildTo(this);
       this.label.alpha = 0.3;
 
