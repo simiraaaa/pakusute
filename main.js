@@ -11,12 +11,16 @@
 
     // adjust scale
     var elm = this.domElement;
-    if (elm.style.width) {
-      x *= elm.width / window.parseInt(elm.style.width, 10);
-    }
-    if (elm.style.height) {
-      y *= elm.height / window.parseInt(elm.style.height, 10);
-    }
+    var rect = elm.getBoundingClientRect();
+    var transedRect = {
+      left: { width: rect.height, height: rect.width },
+      top: rect,
+    };
+    transedRect.right = transedRect.left;
+    transedRect.bottom = rect;
+    transedRect = transedRect[settings.rotate];
+    x *= elm.width / transedRect.width;
+    y *= elm.height / transedRect.height;
     var v = settings.getPoint(x, y, elm.width, elm.height);
     this._tempPosition.x = v.x;
     this._tempPosition.y = v.y;
@@ -74,6 +78,7 @@
     getTransformRotate: function() {
       return this._rotateMap[this.rotate];
     },
+    
     getPoint: function(x, y, w, h) { return { x: x, y: y }; },
     getPointMap: {
       left: function(x, y, w, h) {
@@ -699,6 +704,7 @@
         fill: 'gray',
         stroke:false,
       }));
+      this.interactive = true;
     },
     onpointstart: function() { console.log('OK:'+this.type);},
 
@@ -942,12 +948,19 @@
   KeyButtonManager.getPoint = function(e) {
 
     var elm = app.domElement;
-    var style = elm.style;
+    //var style = elm.style;
     var rect = elm.getBoundingClientRect();
     var x = e.clientX - rect.left;
     var y = e.clientY - rect.top;
-    x *= elm.width / window.parseInt(style.width, 10);
-    y *= elm.height / window.parseInt(style.height, 10);
+    var transedRect = {
+      left: {width:rect.height,height:rect.width},
+      top: rect,
+    };
+    transedRect.right = transedRect.left;
+    transedRect.bottom = rect;
+    transedRect = transedRect[settings.rotate];
+    x *= elm.width / transedRect.width;
+    y *= elm.height / transedRect.height;
     return settings.getPoint(x, y, elm.width,elm.height);
   };
 
