@@ -3,6 +3,24 @@
 
 
 !function (phina, undefined) {
+  
+  // スケールと回転を考慮
+  phina.input.Input.prototype._move = function(x, y) {
+    //this._tempPosition.x = x;
+    //this._tempPosition.y = y;
+
+    // adjust scale
+    var elm = this.domElement;
+    if (elm.style.width) {
+      x *= elm.width / window.parseInt(elm.style.width, 10);
+    }
+    if (elm.style.height) {
+      y *= elm.height / window.parseInt(elm.style.height, 10);
+    }
+    var v = settings.getPoint(x, y, elm.width, elm.height);
+    this._tempPosition.x = v.x;
+    this._tempPosition.y = v.y;
+  };
 
   /**
   ログから譜面を作る
@@ -11,7 +29,7 @@
   描画の更新はUPDATEで行う。
 
   */
-  var VERSION = '0.0.5';
+  var VERSION = '0.0.6';
 
   var SCREEN_WIDTH = 480;
   var SCREEN_HEIGHT = 320;
@@ -143,7 +161,7 @@
     //pointing = app.pointing;
     app.fps = 60;
     app.backgroundColor = '#55a';
-
+    app.interactive.cursor.normal = app.interactive.cursor.hover = '';
     var _fitFunc = app._fitFunc=function() {
       var e = app.domElement;
       var s = e.style;
@@ -215,7 +233,8 @@
 
 
     app.pushScene(phina.game.LoadingScene(SCENE_ARGUMENTS).on('exit', function() {
-      app.replaceScene(SettingScene());
+      KeyButton.SE = [sounds.se, sounds.snare, sounds.se, sounds.snare, sounds.se];
+      app.replaceScene(GameScene());
     }));
     app.run();
   });
@@ -240,12 +259,41 @@
     init: function() {
       this.superInit(SCENE_ARGUMENTS);
       settings.refresh();
-
-      KeyButton.SE = [sounds.se, sounds.snare, sounds.se, sounds.snare, sounds.se];
     },
-    onenter: function() {
-      this.app.replaceScene(GameScene());
-    }
+    //onenter: function() {
+    //  this.app.replaceScene(GameScene());
+    //},
+
+    _static: {
+
+      // 末端処理に関数を入れるが、未実装は false
+      settingTree: {
+        index: [
+          "ゲームスタート",
+          '音量'
+        ],
+        
+        "ゲームスタート": function() {
+          app.replaceScene(GameScene());
+        },
+
+        "音量": {
+          "BGM": false,
+          "効果音": false,
+          index: ["BGM","効果音"]
+        },
+      }
+    },
+  });
+
+  // 縦並びボタン型メニュー
+  var MenuDialog = phina.define('', {
+    superClass: phina.display.CanvasElement,
+
+    init: function(menu) {
+      this.superInit();
+      this.menu = menu;
+    },
   });
 
   //var PopupScene = phina.define('', {
@@ -543,7 +591,9 @@
         fill: 'gray',
         stroke:false,
       }));
+      this.interactive = true;
     },
+    onpointstart: function() { console.log('OK:'+this.type);},
 
     //どっちかって言うとpressだと思う
     push: function () {
