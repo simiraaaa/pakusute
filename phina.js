@@ -8930,7 +8930,7 @@ phina.namespace(function() {
 
       this.mouse = phina.input.Mouse(this.domElement);
       this.touch = phina.input.Touch(this.domElement);
-      this.touchList = phina.input.TouchList(this.domElement, 20);
+      this.touchList = phina.input.TouchList(this.domElement, 100);
       this.keyboard = phina.input.Keyboard(document);
 
       // ポインタをセット(PC では Mouse, Mobile では Touch)
