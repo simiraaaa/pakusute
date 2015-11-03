@@ -29,7 +29,7 @@
   描画の更新はUPDATEで行う。
 
   */
-  var VERSION = '0.0.7';
+  var VERSION = '0.0.8';
 
   var SCREEN_WIDTH = 480;
   var SCREEN_HEIGHT = 320;
@@ -698,7 +698,6 @@
         fill: 'gray',
         stroke:false,
       }));
-      this.interactive = true;
     },
     onpointstart: function() { console.log('OK:'+this.type);},
 
