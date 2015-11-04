@@ -33,7 +33,7 @@
   描画の更新はUPDATEで行う。
 
   */
-  var VERSION = '0.0.11';
+  var VERSION = '0.0.12';
 
   var SCREEN_WIDTH = 480;
   var SCREEN_HEIGHT = 320;
@@ -107,6 +107,7 @@
       sounds.snare.volume = this.volumes.se;
 
       this.getPoint = this.getPointMap[this.rotate];
+      app.domElement.style.transform = settings.getTransformRotate();
       app._fitFunc();
     },
     volumes: {
@@ -179,7 +180,7 @@
     var _fitFunc = app._fitFunc=function() {
       var e = app.domElement;
       var s = e.style;
-
+      var w, h;
       s.position = "absolute";
       s.margin = "auto";
       s.left = "0px";
@@ -187,7 +188,6 @@
       s.bottom = "0px";
       s.right = "0px";
 
-      s.transform = settings.getTransformRotate();
 
       if ({ left: 1, right: 1 }[settings.rotate]) {
         var rateWidth = e.width / window.innerHeight;
@@ -195,12 +195,17 @@
         var rate = e.height / e.width;
 
         if (rateWidth > rateHeight) {
-          s.width = Math.floor(innerHeight) + "px";
-          s.height = Math.floor(innerHeight * rate) + "px";
+          s.width = (w=Math.floor(innerHeight)) + "px";
+          s.height = (h=Math.floor(innerHeight * rate)) + "px";
         }
         else {
-          s.width = Math.floor(innerWidth / rate) + "px";
-          s.height = Math.floor(innerWidth) + "px";
+          s.width =(w= Math.floor(innerWidth / rate) )+ "px";
+          s.height = (h = Math.floor(innerWidth)) + "px";
+        }
+        if (w < h) {
+          s.top = (Math.floor(w - h) / 2) + "px";
+        } else {
+          s.left = (Math.floor(h - w) / 2) + "px";
         }
 
       } else {
@@ -209,15 +214,16 @@
         var rate = e.height / e.width;
 
         if (rateWidth > rateHeight) {
-          s.width = Math.floor(innerWidth) + "px";
-          s.height = Math.floor(innerWidth * rate) + "px";
+          w=s.width = Math.floor(innerWidth) + "px";
+          h=s.height = Math.floor(innerWidth * rate) + "px";
         }
         else {
-          s.width = Math.floor(innerHeight / rate) + "px";
-          s.height = Math.floor(innerHeight) + "px";
+          w=s.width = Math.floor(innerHeight / rate) + "px";
+          h=s.height = Math.floor(innerHeight) + "px";
         }
       }
-    };
+      console.log('width:', w, 'height:', h);
+    } || function() { };
 
     var fitScreen = function(isEver) {
       isEver = isEver === undefined ? true : isEver;
