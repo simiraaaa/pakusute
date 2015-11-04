@@ -46,11 +46,7 @@
   };
   var window = phina.global;
   window.onerror = function(a,b,c,d,e) {
-    alert(a);
-    alert(b);
-    alert(c);
-    alert(d);
-    alert(JSON.stringify(e));
+    console.log(a, b, c, d, e);
   };
   // localize
   var display = phina.display;
@@ -269,7 +265,7 @@
 
       this.addChild(KeyButtonManager().setup());
       this.addChild(music);
-      this.addChild(MessageLayer());
+      this.addChild(MessageLayer().bindConsole());
     },
   });
 
@@ -281,6 +277,7 @@
       settings.refresh();
       Label(VERSION).setPosition(10, 20).addChildTo(this).align='left';
       var menu = MenuDialog(this._static.settingTree).addChildTo(this);
+      this.addChild(MessageLayer().bindConsole());
     },
     //onenter: function() {
     //  this.app.replaceScene(GameScene());
@@ -451,6 +448,44 @@
       this.label.alpha = 0.3;
 
       otoge.message = this;
+
+      var self = this;
+      var c = this.console = [];
+      c._dirtyPush = function(text) {
+        var len = this.length;
+        if (10 < len) {
+          this.shift().remove();
+        }
+
+        this.forEach(function(e, i) {
+          e.setPosition(10, (len - i) * 16 + SCREEN_HEIGHT/2);
+        });
+
+        this.push(Label({
+          text: text,
+          fontSize: 20,
+          fill: 'white',
+          stroke: false,
+          baseline: 'top',
+          align: 'left'
+        }).addChildTo(self)
+          .setPosition(10, SCREEN_HEIGHT / 2));
+      };
+    },
+
+    pushConsole: function(text) {
+      this.console._dirtyPush(text);
+      return this;
+    },
+
+    bindConsole: function() {
+      var self = this;
+      var _log = console.log;
+      console.log = function() {
+        _log.apply(console, arguments);
+        self.pushConsole([].slice.call(arguments, 0));
+      };
+      return this;
     },
 
     update: function (app) {
