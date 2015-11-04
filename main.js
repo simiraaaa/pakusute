@@ -178,6 +178,9 @@
   phina.main(function () {
     app = phina.display.CanvasApp(SCENE_ARGUMENTS);
     app.enableStats();
+
+    debugConsole.bindConsole();
+    
     //pointing = app.pointing;
     app.fps = 60;
     app.backgroundColor = '#55a';
@@ -274,7 +277,7 @@
 
       this.addChild(KeyButtonManager().setup());
       this.addChild(music);
-      this.addChild(MessageLayer().bindConsole());
+      this.addChild(MessageLayer());
     },
   });
 
@@ -286,7 +289,6 @@
       settings.refresh();
       Label(VERSION).setPosition(10, 20).addChildTo(this).align='left';
       var menu = MenuDialog(this._static.settingTree).addChildTo(this);
-      this.addChild(MessageLayer().bindConsole());
     },
     //onenter: function() {
     //  this.app.replaceScene(GameScene());
@@ -430,36 +432,17 @@
   //  },
   //});
 
+  var debugConsole = {
+    consoles: [],
 
-  var MessageLayer = phina.define('', {
-    superClass: CanvasElement,
-
-    label: null,
-    just: 0,
-    good: 0,
-    bad: 0,
-    miss: 0,
-    debug:0,
-    __consoleArea:document.createElement('div'),
-
-    init: function () {
-      this.superInit();
-
-      this.label = Label({
-        text: '',
-        align: 'left',
-        fontSize: 24,
-        fill: 'white',
-        baseline:'top',
-      })
-      .setPosition(20, 60)
-      .addChildTo(this);
-      this.label.alpha = 0.3;
-
-      otoge.message = this;
-
+    bindConsole: function() {
+    },
+    _binded: false,
+    __consoleArea: document.createElement('div'),
+    init: function() {
+      this._start = true;
       var self = this;
-      var c = this.console = [];
+      var c = this.consoles;
       var area = this.__consoleArea;
       c._dirtyPush = function(text) {
         var len = this.length;
@@ -473,13 +456,16 @@
       };
     },
 
+
     pushConsole: function(text) {
-      this.console._dirtyPush(text);
+      this.consoles._dirtyPush(text);
       return this;
     },
 
     bindConsole: function() {
-
+      if (this._binded) return;
+      if (!this._start) this.init();
+      this._binded = true;
       var self = this;
       var _log = console.log;
       console.log = function() {
@@ -497,12 +483,38 @@
         height: '0vh',
         padding: "0",
       });
-      var area = this.__consoleArea;
-      ["mouseup", "mouseout", "mouseup", "mousemove", "touchstart", "touchend", "touchend", "touchmove"].forEach(function(e) {
-        area.addEventListener(e, function(e) { e.preventDefault();}, true);
-      });
       return this;
     },
+  };
+
+  var MessageLayer = phina.define('', {
+    superClass: CanvasElement,
+
+    label: null,
+    just: 0,
+    good: 0,
+    bad: 0,
+    miss: 0,
+    debug:0,
+
+    init: function () {
+      this.superInit();
+
+      this.label = Label({
+        text: '',
+        align: 'left',
+        fontSize: 24,
+        fill: 'white',
+        baseline:'top',
+      })
+      .setPosition(20, 60)
+      .addChildTo(this);
+      this.label.alpha = 0.3;
+
+      otoge.message = this;
+
+    },
+
 
     update: function (app) {
       this.label.text ='ver.'+VERSION+'\ndebug:'+this.debug+'\n'+
@@ -688,8 +700,8 @@
     draw: function (canvas) {
       var c = canvas.context;
       if (!this.score.length) return;
-      var SIZE = KeyButton.RADIUS * 2 + KeyButton.STROKE_WIDTH;
       var image = this.__image;
+      var w = image.width, h = image.height;
       var score = this.score;
       var JUST_Y = this.JUST_Y;
       var rTime = otoge.getRelativeTime();
@@ -706,7 +718,7 @@
           //miss
           return this.miss(score.splice(0, 1 + i));
         }
-        c.drawImage(image, 0, 0, SIZE, SIZE, 0, (1 + (y * speed)) * JUST_Y | 0, SIZE, SIZE);
+        c.drawImage(image, 0, 0, w, h, 0, (1 + (y * speed)) * JUST_Y | 0, w, h);
       }
     },
 
