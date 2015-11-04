@@ -470,6 +470,7 @@
     },
 
     bindConsole: function() {
+
       var self = this;
       var _log = console.log;
       console.log = function() {
@@ -755,7 +756,6 @@
       }));
 
       this.setSize(KeyButton.INTERACTIVE_WIDTH, KeyButton.INTERACTIVE_HEIGHT);
-      this.interactive = true;
     },
     onpointstart: function() { console.log('OK:'+this.type);},
 
@@ -786,7 +786,7 @@
     },
 
     pushWave: function () {
-      var wave = Wave(this.canvas);
+      var wave = Wave(this.button.canvas);
       wave.$extend({
         x: this.x,
         y: this.y,
@@ -800,7 +800,7 @@
       STROKE_WIDTH: 3,
 
       INTERACTIVE_WIDTH: SCREEN_WIDTH / 5.5 | 0,
-      INTERACTIVE_HEIGHT: SCREEN_WIDTH / 5.5 | 0,
+      INTERACTIVE_HEIGHT: SCREEN_HEIGHT * 0.32 | 0,
 
       TYPES: ['D', 'F', 'J', 'K','L'],
       KEY_CODES: [68, 70, 74, 75, 76],
