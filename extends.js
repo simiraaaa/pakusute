@@ -7,7 +7,7 @@
    * ログの記録。読み込み、出力を行う
    */
   phina.define("phina.util.Log", {
-    superClass: phina.event.EventDispatcher,
+    superClass: phina.util.EventDispatcher,
     log: null,
     isMin: false,
     min: null,
