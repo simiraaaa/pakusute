@@ -42,7 +42,7 @@
   描画の更新はUPDATEで行う。
 
   */
-  var VERSION = '0.0.12';
+  var VERSION = '0.0.13';
 
   var SCREEN_WIDTH = 480;
   var SCREEN_HEIGHT = 320;
@@ -494,7 +494,6 @@
         position: "absolute",
         top: "10vh",
         left: "0px",
-        width: '0vw',
         height: '0vh',
         padding: "0",
       });
