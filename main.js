@@ -431,7 +431,7 @@
     bad: 0,
     miss: 0,
     debug:0,
-
+    __consoleArea:document.createElement('div'),
 
     init: function () {
       this.superInit();
@@ -451,25 +451,16 @@
 
       var self = this;
       var c = this.console = [];
+      var area = this.__consoleArea;
       c._dirtyPush = function(text) {
         var len = this.length;
         if (10 < len) {
-          this.shift().remove();
+          area.removeChild(this.shift());
         }
-
-        this.forEach(function(e, i) {
-          e.setPosition(10, (len - i) * 16 + SCREEN_HEIGHT/2);
-        });
-
-        this.push(Label({
-          text: text,
-          fontSize: 20,
-          fill: 'white',
-          stroke: false,
-          baseline: 'top',
-          align: 'left'
-        }).addChildTo(self)
-          .setPosition(10, SCREEN_HEIGHT / 2));
+        var s = document.createElement('div');
+        s.textContent = text;
+        area.insertBefore(s, area.firstChild);
+        this.push(s);
       };
     },
 
@@ -485,6 +476,22 @@
         _log.apply(console, arguments);
         self.pushConsole([].slice.call(arguments, 0));
       };
+
+      document.body.appendChild(this.__consoleArea);
+
+      this.__consoleArea.style.$extend({
+        fontSize: '14px',
+        position: "absolute",
+        top: "10vh",
+        left: "0px",
+        width: '0vw',
+        height: '0vh',
+        padding: "0",
+      });
+      var area = this.__consoleArea;
+      ["mouseup", "mouseout", "mouseup", "mousemove", "touchstart", "touchend", "touchend", "touchmove"].forEach(function(e) {
+        area.addEventListener(e, function(e) { e.preventDefault();}, true);
+      });
       return this;
     },
 
@@ -719,7 +726,7 @@
 
   //押すところ
   var KeyButton = phina.define('', {
-    superClass: display.CircleShape,
+    superClass: CanvasElement,
     type: null,
     keyCode: null,
     renderFlag:false,
@@ -728,10 +735,11 @@
 
 
     init: function (index) {
-      this.superInit({
-        radius:KeyButton.RADIUS,
+      this.superInit();
+      var button = this.button = display.CircleShape({
+        radius: KeyButton.RADIUS,
         strokeWidth: KeyButton.STROKE_WIDTH,
-      }.$extend(KeyButton.KEY_PARAM[index]));
+      }.$extend(KeyButton.KEY_PARAM[index])).addChildTo(this);
       this.setPosition(KeyButton.getDefaultX(index), KeyButton.DEFAULT_Y);
 
       this.type = KeyButton.TYPES[index];
@@ -741,10 +749,12 @@
 
       this.addChild(Label({
         text: this.type,
-        fontSize: this.width,
+        fontSize: this.button.width,
         fill: 'gray',
         stroke:false,
       }));
+
+      this.setSize(KeyButton.INTERACTIVE_WIDTH, KeyButton.INTERACTIVE_HEIGHT);
       this.interactive = true;
     },
     onpointstart: function() { console.log('OK:'+this.type);},
@@ -789,6 +799,9 @@
       RADIUS: 24,
       STROKE_WIDTH: 3,
 
+      INTERACTIVE_WIDTH: SCREEN_WIDTH / 5.5 | 0,
+      INTERACTIVE_HEIGHT: SCREEN_WIDTH / 5.5 | 0,
+
       TYPES: ['D', 'F', 'J', 'K','L'],
       KEY_CODES: [68, 70, 74, 75, 76],
       TYPE_INDEX: {
@@ -830,8 +843,8 @@
             stroke: 'white',
           },
       ],
-      getDefaultX: function(index) { return (1 + index) * SCREEN_WIDTH / 5.5 - SCREEN_WIDTH / 22; },
-      DEFAULT_Y: SCREEN_HEIGHT * 0.84,
+      getDefaultX: function(index) { return (1 + index) * SCREEN_WIDTH / 5.5 - SCREEN_WIDTH / 22 | 0; },
+      DEFAULT_Y: SCREEN_HEIGHT * 0.84 | 0,
 
     }
 
