@@ -5662,6 +5662,33 @@ phina.namespace(function() {
       this._scenes = [phina.app.Scene()];
       this._sceneIndex = 0;
       this._originalStats = {
+        _prevTime: 0,
+
+        max: 0,
+        min: Infinity,
+        fpsList: [],
+
+        set ms(ms) {
+          var list = this.fpsList;
+          if (list.length > 120) {
+            list.shift();
+          }
+          if (this.min > ms) this.min = ms;
+          if (this.max < ms) this.max = ms;
+          list.push(ms);
+        },
+        get ms() {
+          return this.fpsList.reduce(function(a, b) { return a + b; }) / this.fpsList.length;
+        },
+
+        get fps() { return 1000 / this.ms; },
+
+        log: function() {
+          var prevTime = this._prevTime;
+          this._prevTime = Date.now();
+          if (0 === prevTime) return;
+          this.ms = Date.now() - prevTime;
+        },
 
         element: document.createElement('div'),
         init: function() {
@@ -5676,10 +5703,14 @@ phina.namespace(function() {
 
         render: function() {
           this.element.innerHTML =
-            'update:' + this.update.fps + "fps<br> " + this.update.ms +
-            "ms<br> max=" + this.update.max + "<br> min=" + this.update.min +
-            "<br><br>draw:" + this.draw.fps + "fps<br> " + this.draw.ms +
-            "ms<br> max=" + this.draw.max + "<br> min=" + this.draw.min;
+            "[" + this.fps.toFixed(2) + "FPS]" +
+            "[" + this.ms.toFixed(3) + 'MS]' +
+            "[MAX:" + this.max + "MS]" +
+            "[MIN:" + this.min + 'MS]<br>' +
+            'update:' + this.update.fps.toFixed(2) + "fps<br> " + this.update.ms.toFixed(3) +
+            "ms, max=" + this.update.max + "ms, min=" + this.update.min +
+            "ms<br><br>draw:" + this.draw.fps.toFixed(2) + "fps<br> " + this.draw.ms.toFixed(3) +
+            "ms, max=" + this.draw.max + "ms, min=" + this.draw.min+"ms";
         },
 
         update: {
@@ -5885,6 +5916,8 @@ phina.namespace(function() {
       originalStats.draw.start();
       this._draw();
       originalStats.draw.end();
+
+      originalStats.log();
       // stats update
       if (this.stats) this.stats.update();
     },
