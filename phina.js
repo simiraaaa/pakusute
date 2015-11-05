@@ -5653,6 +5653,7 @@ phina.namespace(function() {
     /** frame */
     frame: null,
 
+    _originalStats:null,
     /**
      * @constructor
      */
@@ -5660,7 +5661,83 @@ phina.namespace(function() {
       this.superInit();
       this._scenes = [phina.app.Scene()];
       this._sceneIndex = 0;
+      this._originalStats = {
 
+        element: document.createElement('div'),
+        init: function() {
+          this.element.style.$extend({
+            position: 'absolute',
+            top: '1vh',
+            left: '1vw',
+            pointerEvents:'none',
+          });
+          document.body.appendChild(this.element);
+        },
+
+        render: function() {
+          this.element.innerHTML =
+            'update:' + this.update.fps + "fps<br> " + this.update.ms +
+            "ms<br> max=" + this.update.max + "<br> min=" + this.update.min +
+            "<br><br>draw:" + this.draw.fps + "fps<br> " + this.draw.ms +
+            "ms<br> max=" + this.draw.max + "<br> min=" + this.draw.min;
+        },
+
+        update: {
+          _time:0,
+          max: 0,
+          min: Infinity,
+          fpsList: [],
+          start: function() {
+            this._time = Date.now();
+          },
+
+          end: function() {
+            this.ms = Date.now() - this._time;
+          },
+          set ms(ms) {
+            var list = this.fpsList;
+            if (list.length > 120) {
+              list.shift();
+            }
+            if (this.min > ms) this.min = ms;
+            if (this.max < ms) this.max = ms;
+            list.push(ms);
+          },
+          get ms() {
+            return this.fpsList.reduce(function(a, b) { return a + b; }) / this.fpsList.length ;
+          },
+
+          get fps() { return 1000 / this.ms ;},
+        },
+
+        draw: {
+          max: 0,
+          _time:0,
+          min: Infinity,
+          fpsList: [],
+          start: function() {
+            this._time = Date.now();
+          },
+
+          end: function() {
+            this.ms = Date.now() - this._time;
+          },
+          set ms(ms) {
+            var list = this.fpsList;
+            if (list.length > 120) {
+              list.shift();
+            }
+            if (this.min > ms) this.min = ms;
+            if (this.max < ms) this.max = ms;
+            list.push(ms);
+          },
+          get ms() {
+            return this.fpsList.reduce(function(a, b) { return a + b; }) / this.fpsList.length ;
+          },
+
+          get fps() { return 1000 / this.ms ; },
+        },
+      };
       this.updater = phina.app.Updater(this);
 
       this.awake = true;
@@ -5757,6 +5834,13 @@ phina.namespace(function() {
     },
 
     enableStats: function() {
+      var originalStats = this._originalStats;
+      originalStats.init();
+      setInterval(function() {
+        originalStats.render();
+      }, 1000);
+
+      return this;
       if (phina.global.Stats) {
         this.stats = new Stats();
         document.body.appendChild(this.stats.domElement);
@@ -5794,9 +5878,13 @@ phina.namespace(function() {
     },
 
     _loop: function() {
+      var originalStats = this._originalStats;
+      originalStats.update.start();
       this._update();
+      originalStats.update.end();
+      originalStats.draw.start();
       this._draw();
-
+      originalStats.draw.end();
       // stats update
       if (this.stats) this.stats.update();
     },

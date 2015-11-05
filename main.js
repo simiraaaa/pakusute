@@ -42,7 +42,7 @@
   描画の更新はUPDATEで行う。
 
   */
-  var VERSION = '0.0.13';
+  var VERSION = '0.0.14';
 
   var SCREEN_WIDTH = 480;
   var SCREEN_HEIGHT = 320;
@@ -478,10 +478,10 @@
       this.__consoleArea.style.$extend({
         fontSize: '14px',
         position: "absolute",
-        top: "10vh",
+        bottom: "0px",
         left: "0px",
-        height: '0vh',
         padding: "0",
+        pointerEvents:'none',
       });
       return this;
     },
