@@ -177,7 +177,7 @@
 
   phina.main(function () {
     app = phina.display.CanvasApp(SCENE_ARGUMENTS);
-    app.enableStats();
+    app.enableOriginalStats();
 
     debugConsole.bindConsole();
     

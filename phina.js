@@ -4401,85 +4401,79 @@ phina.namespace(function() {
 })();
 
 
-;(function() {
+
+; (function() {
 
   phina.define('phina.input.TouchList', {
-    domElement: null,
+    superClass: Array,
 
-    init: function(domElement, length) {
+    domElement: null,
+    touchMap: null,
+    init: function(domElement) {
       this.domElement = domElement;
 
-      this.touches = [];
-      this.stockes = [];
-
-      (length).times(function() {
-        var touch = phina.input.Touch(domElement, true);
-        touch.id = null;
-        this.stockes.push(touch);
-      }, this);
+      this.touches = this;
 
       var self = this;
       this.domElement.addEventListener('touchstart', function(e) {
-        Array.prototype.forEach.call(e.changedTouches, function(t) {
+        self.forEach.call(e.changedTouches, function(t) {
           var touch = self.getEmpty();
-
           touch.id = t.identifier;
           touch._start(t.pointX, t.pointY);
         });
       });
 
       this.domElement.addEventListener('touchend', function(e) {
-        Array.prototype.forEach.call(e.changedTouches, function(t) {
-          var touch = self.getTouch(t.identifier);
-          touch._end();
+        self.forEach.call(e.changedTouches, function(t) {
+          self.getTouch(t.identifier).forEach(function(touch) {
+            touch._end();
+          });
         });
       });
       this.domElement.addEventListener('touchmove', function(e) {
-        Array.prototype.forEach.call(e.changedTouches, function(t) {
-          var touch = self.getTouch(t.identifier);
-          touch._move(t.pointX, t.pointY);
+        self.forEach.call(e.changedTouches, function(t) {
+          self.getTouch(t.identifier).forEach(function(touch) {
+            touch._move(t.pointX, t.pointY);
+          });
         });
         e.stop();
       });
     },
 
     getEmpty: function() {
-      var touch = this.stockes.pop();
-      this.touches.push(touch);
-
+      var touch = phina.input.Touch(this.domElement, true);
+      this.push(touch);
       return touch;
     },
 
     getTouch: function(id) {
-      return this.touches.filter(function(touch) {
-        return touch.id === id;
-      })[0];
+      return this.filter(function(touch) {
+        return touch.id === id && touch.flags !== 0;
+      });
     },
 
     removeTouch: function(touch) {
-      var i = this.touches.indexOf(touch);
-      this.touches.splice(i, 1);
-      this.stockes.push(touch);
+      var i = this.indexOf(touch);
+      this.splice(i, 1);
     },
 
     update: function() {
-      this.touches.forEach(function(touch) {
-        if (touch.id !== null) {
-          if (!touch.released) {
-            touch.update();
+      this.forEach(function(touch) {
+        if (!touch.released) {
+          touch.update();
 
-            if (touch.flags === 0) {
-              touch.released = true;
-            }
-          }
-          else {
-            touch.released = false;
-            this.removeTouch(touch);
+          if (touch.flags === 0) {
+            touch.released = true;
           }
         }
+        else {
+          touch.released = false;
+          this.removeTouch(touch);
+        }
+
       }, this);
     }
-  })
+  });
 
 })();
 /*
@@ -5653,7 +5647,6 @@ phina.namespace(function() {
     /** frame */
     frame: null,
 
-    _originalStats:null,
     /**
      * @constructor
      */
@@ -5661,114 +5654,6 @@ phina.namespace(function() {
       this.superInit();
       this._scenes = [phina.app.Scene()];
       this._sceneIndex = 0;
-      this._originalStats = {
-        _prevTime: 0,
-
-        max: 0,
-        min: Infinity,
-        fpsList: [],
-
-        set ms(ms) {
-          var list = this.fpsList;
-          if (list.length > 120) {
-            list.shift();
-          }
-          if (this.min > ms) this.min = ms;
-          if (this.max < ms) this.max = ms;
-          list.push(ms);
-        },
-        get ms() {
-          return this.fpsList.reduce(function(a, b) { return a + b; }) / this.fpsList.length;
-        },
-
-        get fps() { return 1000 / this.ms; },
-
-        log: function() {
-          var prevTime = this._prevTime;
-          this._prevTime = Date.now();
-          if (0 === prevTime) return;
-          this.ms = Date.now() - prevTime;
-        },
-
-        element: document.createElement('div'),
-        init: function() {
-          this.element.style.$extend({
-            position: 'absolute',
-            top: '1vh',
-            left: '1vw',
-            pointerEvents:'none',
-          });
-          document.body.appendChild(this.element);
-        },
-
-        render: function() {
-          this.element.innerHTML =
-            "[" + this.fps.toFixed(2) + "FPS]" +
-            "[" + this.ms.toFixed(3) + 'MS]' +
-            "[MAX:" + this.max + "MS]" +
-            "[MIN:" + this.min + 'MS]<br>' +
-            'update:' + this.update.fps.toFixed(2) + "fps<br> " + this.update.ms.toFixed(3) +
-            "ms, max=" + this.update.max + "ms, min=" + this.update.min +
-            "ms<br><br>draw:" + this.draw.fps.toFixed(2) + "fps<br> " + this.draw.ms.toFixed(3) +
-            "ms, max=" + this.draw.max + "ms, min=" + this.draw.min+"ms";
-        },
-
-        update: {
-          _time:0,
-          max: 0,
-          min: Infinity,
-          fpsList: [],
-          start: function() {
-            this._time = Date.now();
-          },
-
-          end: function() {
-            this.ms = Date.now() - this._time;
-          },
-          set ms(ms) {
-            var list = this.fpsList;
-            if (list.length > 120) {
-              list.shift();
-            }
-            if (this.min > ms) this.min = ms;
-            if (this.max < ms) this.max = ms;
-            list.push(ms);
-          },
-          get ms() {
-            return this.fpsList.reduce(function(a, b) { return a + b; }) / this.fpsList.length ;
-          },
-
-          get fps() { return 1000 / this.ms ;},
-        },
-
-        draw: {
-          max: 0,
-          _time:0,
-          min: Infinity,
-          fpsList: [],
-          start: function() {
-            this._time = Date.now();
-          },
-
-          end: function() {
-            this.ms = Date.now() - this._time;
-          },
-          set ms(ms) {
-            var list = this.fpsList;
-            if (list.length > 120) {
-              list.shift();
-            }
-            if (this.min > ms) this.min = ms;
-            if (this.max < ms) this.max = ms;
-            list.push(ms);
-          },
-          get ms() {
-            return this.fpsList.reduce(function(a, b) { return a + b; }) / this.fpsList.length ;
-          },
-
-          get fps() { return 1000 / this.ms ; },
-        },
-      };
       this.updater = phina.app.Updater(this);
 
       this.awake = true;
@@ -5865,13 +5750,6 @@ phina.namespace(function() {
     },
 
     enableStats: function() {
-      var originalStats = this._originalStats;
-      originalStats.init();
-      setInterval(function() {
-        originalStats.render();
-      }, 1000);
-
-      return this;
       if (phina.global.Stats) {
         this.stats = new Stats();
         document.body.appendChild(this.stats.domElement);
@@ -5909,15 +5787,8 @@ phina.namespace(function() {
     },
 
     _loop: function() {
-      var originalStats = this._originalStats;
-      originalStats.update.start();
       this._update();
-      originalStats.update.end();
-      originalStats.draw.start();
       this._draw();
-      originalStats.draw.end();
-
-      originalStats.log();
       // stats update
       if (this.stats) this.stats.update();
     },
@@ -9051,7 +8922,7 @@ phina.namespace(function() {
 
       this.mouse = phina.input.Mouse(this.domElement);
       this.touch = phina.input.Touch(this.domElement);
-      this.touchList = phina.input.TouchList(this.domElement, 100);
+      this.touchList = phina.input.TouchList(this.domElement, 5);
       this.keyboard = phina.input.Keyboard(document);
 
       // ポインタをセット(PC では Mouse, Mobile では Touch)

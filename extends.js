@@ -194,8 +194,126 @@
       return this;
     },
 
+  });
 
 
+
+  phina.app.BaseApp.prototype.$extend({
+    enableOriginalStats: function() {
+      var originalStats = this._originalStats = phina.feature.originalStats();
+      setInterval(function() {
+        originalStats.render();
+      }, 1000);
+
+      return this;
+    },
+    _loop: function() {
+      var originalStats = this._originalStats;
+      if (originalStats) {
+        originalStats.update.start();
+        this._update();
+        originalStats.update.end();
+        originalStats.draw.start();
+        this._draw();
+        originalStats.draw.end();
+
+        originalStats.log();
+      }
+      else {
+        this._update();
+        this._draw();
+        // stats update
+        if (this.stats) this.stats.update();
+      }
+    },
 
   });
+
+  phina.define('phina.feature.Measurer', {
+    min: Infinity,
+    max: 0,
+    length:120,
+    list: null,
+    _prevTime:0,
+    init: function(length) {
+      if (length) this.length = length;
+      this.list = [];
+    },
+
+
+    // 処理速度を測定したいとき開始
+    start: function() {
+      this._prevTime = Date.now();
+    },
+
+    // 処理速度を測定したいときの終わり
+    end: function() {
+      this.ms = Date.now() - this._prevTime;
+    },
+
+    // 1フレームに一回実行したい時
+    log: function() {
+      var prevTime = this._prevTime;
+      this._prevTime = Date.now();
+      if (0 === prevTime) return;
+      this.ms = Date.now() - prevTime;
+    },
+
+    _accessor: {
+      fps: { get: function() { return 1000 / this.ms; } },
+      ms: {
+        get: function() {
+          return this.list.reduce(function(a, b) { return a + b; }) / this.list.length;
+        },
+        set: function(ms) {
+
+          var list = this.list;
+          while (list.length > this.length) {
+            list.shift();
+          }
+          if (this.min > ms) this.min = ms;
+          if (this.max < ms) this.max = ms;
+          list.push(ms);
+        },
+      },
+    }
+  });
+
+  phina.define('phina.feature.originalStats', {
+    superClass:phina.feature.Measurer,
+
+    draw: null,
+    update: null,
+    domElement: null,
+    init: function(length) {
+      this.superInit(length);
+      
+      this.domElement = document.createElement('div');
+
+      this.domElement.style.$extend({
+        position: 'absolute',
+        top: '1vh',
+        left: '1vw',
+        pointerEvents: 'none',
+      });
+      document.body.appendChild(this.domElement);
+
+      this.draw = phina.feature.Measurer();
+      this.update = phina.feature.Measurer();
+
+    },
+
+    render: function() {
+      this.domElement.innerHTML =
+        "[" + this.fps.toFixed(2) + "FPS]" +
+        "[" + this.ms.toFixed(3) + 'MS]' +
+        "[MAX:" + this.max + "MS]" +
+        "[MIN:" + this.min + 'MS]<br>' +
+        'update:' + this.update.fps.toFixed(2) + "fps<br> " + this.update.ms.toFixed(3) +
+        "ms, max=" + this.update.max + "ms, min=" + this.update.min +
+        "ms<br><br>draw:" + this.draw.fps.toFixed(2) + "fps<br> " + this.draw.ms.toFixed(3) +
+        "ms, max=" + this.draw.max + "ms, min=" + this.draw.min + "ms";
+    },
+  });
+
 })(phina);
