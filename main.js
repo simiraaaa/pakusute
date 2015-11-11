@@ -581,7 +581,8 @@
       this.label.on('enterframe', function() {
         this._dirtyDraw = true; 
       });
-      var s = new Date ();
+      var s = new Date();
+      this.label._render();
       this.label._render();
       console.log(new Date - s);
     },
