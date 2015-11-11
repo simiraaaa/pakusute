@@ -98,7 +98,7 @@
   描画の更新はUPDATEで行う。
 
   */
-  var VERSION = '0.0.16';
+  var VERSION = '0.0.17';
 
   var SCREEN_WIDTH = 480;
   var SCREEN_HEIGHT = 320;
@@ -579,9 +579,10 @@
       + '\nchange speed:cursor up↑ or down↓\nchange rotate cursor ← →';
       otoge.message = this;
       this.label.on('enterframe', function() {
-        this._dirtyDraw = true; 
+        this.label._render();
       });
       var s = new Date();
+      this.label._render();
       this.label._render();
       this.label._render();
       console.log(new Date - s);
