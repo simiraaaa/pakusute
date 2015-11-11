@@ -563,7 +563,7 @@
       this.label = Label({
         text: '',
         align: 'left',
-        fontSize: 24,
+        fontSize: 5,
         fill: 'white',
         baseline:'top',
       })
