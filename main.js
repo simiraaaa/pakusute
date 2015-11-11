@@ -334,7 +334,7 @@
       this.superInit(SCENE_ARGUMENTS);
       settings.refresh();
       var music = Music('bgm', SCORE);
-      this.backgroundColor = "#55a";
+      //this.backgroundColor = "#55a";
       this.addChild(KeyButtonManager().setup());
       this.addChild(music);
       this.addChild(MessageLayer());
