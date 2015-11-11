@@ -579,7 +579,7 @@
       + '\nchange speed:cursor up↑ or down↓\nchange rotate cursor ← →';
       otoge.message = this;
       this.label.on('enterframe', function() {
-        this.label._render();
+        this._render();
       });
       var s = new Date();
       this.label._render();
