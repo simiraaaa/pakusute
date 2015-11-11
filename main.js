@@ -182,7 +182,7 @@
     debugConsole.bindConsole();
     
     //pointing = app.pointing;
-    app.fps = 60;
+    app.fps = 120;
     app.backgroundColor = '#55a';
     app.interactive.cursor.normal = app.interactive.cursor.hover = '';
     var _fitFunc = app._fitFunc=function() {
