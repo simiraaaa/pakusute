@@ -243,7 +243,7 @@
     
     //pointing = app.pointing;
     app.fps = 120;
-    app.backgroundColor = '#55a';
+    //app.backgroundColor = '#55a';
     app.interactive.cursor.normal = app.interactive.cursor.hover = '';
     var _fitFunc = app._fitFunc=function() {
       var e = app.domElement;
@@ -334,7 +334,7 @@
       this.superInit(SCENE_ARGUMENTS);
       settings.refresh();
       var music = Music('bgm', SCORE);
-
+      this.backgroundColor = "#55a";
       this.addChild(KeyButtonManager().setup());
       this.addChild(music);
       this.addChild(MessageLayer());
