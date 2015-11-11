@@ -565,7 +565,7 @@
       })
       .setPosition(20, 60)
       .addChildTo(this);
-      //this.label.alpha = 0.3;
+      this.label.alpha = 0.3;
 
       this.label.text = 'ver.' + VERSION + '\ndebug:' + this.debug + '\n' +
           'just:' + this.just
