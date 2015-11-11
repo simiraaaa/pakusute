@@ -582,8 +582,7 @@
         this._dirtyDraw = true; 
       });
       var s = new Date ();
-      for (var i = 0; i < 1000; ++i)
-        this.label._render();
+      this.label._render();
       console.log(new Date - s);
     },
 
