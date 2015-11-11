@@ -565,21 +565,27 @@
       })
       .setPosition(20, 60)
       .addChildTo(this);
-      this.label.alpha = 0.3;
+      //this.label.alpha = 0.3;
 
-      otoge.message = this;
-
-    },
-
-
-    update: function (app) {
-      this.label.text ='ver.'+VERSION+'\ndebug:'+this.debug+'\n'+
+      this.label.text = 'ver.' + VERSION + '\ndebug:' + this.debug + '\n' +
           'just:' + this.just
       + ',good:' + this.good
       + ',bad:' + this.bad
       + ',miss:' + this.miss
       + '\nchange speed:cursor up↑ or down↓\nchange rotate cursor ← →';
-    }
+      otoge.message = this;
+
+    },
+
+
+    //update: function (app) {
+    //  this.label.text ='ver.'+VERSION+'\ndebug:'+this.debug+'\n'+
+    //      'just:' + this.just
+    //  + ',good:' + this.good
+    //  + ',bad:' + this.bad
+    //  + ',miss:' + this.miss
+    //  + '\nchange speed:cursor up↑ or down↓\nchange rotate cursor ← →';
+    //}
 
 
   });
