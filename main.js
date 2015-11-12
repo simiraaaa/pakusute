@@ -8,60 +8,7 @@
 
   
   // debug area-----------------
-  //phina.display.Label.prototype.$extend({
-    
-  //  _render: function() {
-  //    var s = otoge.currentTime;
-  //    var b =!Math.randint(0,60);
-  //    var canvas = this.canvas;
-  //    var context = canvas.context;
 
-  //    var fontSize = this.fontSize;
-  //    var font = "{fontWeight} {fontSize}px {fontFamily}".format(this);
-  //    var text = this.text + '';
-  //    var lines = this._lines = text.split('\n');
-  //    canvas.context.font = font;
-  //    if(b)console.log(otoge.currentTime - s, 'font');
-  //    var w = this.calcWidth() + this.padding * 2;
-  //    var h = this.calcHeight() + this.padding * 2;
-  //    this._renderBackground(w, h);
-
-  //    if (b) console.log(otoge.currentTime - s, 'bg');
-  //    canvas.transformCenter();
-  //    context.font = font;
-  //    context.textAlign = this.align;
-  //    context.textBaseline = this.baseline;
-
-  //    if (b) console.log(otoge.currentTime - s, 'context');
-  //    var lineSize = fontSize * this.lineHeight;
-  //    var offset = -Math.floor(lines.length / 2) * lineSize;
-  //    offset += ((lines.length + 1) % 2) * (lineSize / 2);
-  //    if (b) console.log(otoge.currentTime - s, 'st');
-  //    if (this.stroke) {
-  //      context.strokeStyle = this.stroke;
-  //      context.lineWidth = this.strokeWidth;
-  //      context.lineJoin = "round";
-  //      context.shadowBlur = 0;
-  //      lines.forEach(function(line, i) {
-  //        context.strokeText(line, 0, i * lineSize + offset);
-  //      }, this);
-  //    }
-  //    if (b) console.log(otoge.currentTime - s, 's');
-  //    if (this.shadow) {
-  //      context.shadowColor = this.shadow;
-  //      context.shadowBlur = this.shadowBlur;
-  //    }
-
-  //    if (b) console.log(otoge.currentTime - s, 'sh');
-  //    if (this.fill) {
-  //      context.fillStyle = this.fill;
-  //      lines.forEach(function(line, i) {
-  //        context.fillText(line, 0, i * lineSize + offset);
-  //      }, this);
-  //    }
-  //    if (b) console.log(otoge.currentTime - s, 'r');
-  //  },
-  //});
 
   // --------- setting -----------
 
@@ -576,7 +523,6 @@
       otoge.message = this;
 
 
-      this.label.draw = null;
     },
 
 
@@ -826,18 +772,18 @@
         strokeWidth: KeyButton.STROKE_WIDTH,
       }.$extend(KeyButton.KEY_PARAM[index])).addChildTo(this);
       this.setPosition(KeyButton.getDefaultX(index), KeyButton.DEFAULT_Y);
-      button.visible = false;
+
       this.type = KeyButton.TYPES[index];
       this.keyCode = KeyButton.KEY_CODES[index];
       this._index = index;
       this.se = KeyButton.SE[index];
 
-      //this.addChild(Label({
-      //  text: this.type,
-      //  fontSize: this.button.width,
-      //  fill: 'gray',
-      //  stroke:false,
-      //}));
+      this.addChild(Label({
+        text: this.type,
+        fontSize: this.button.width,
+        fill: 'gray',
+        stroke:false,
+      }));
 
       this.setSize(KeyButton.INTERACTIVE_WIDTH, KeyButton.INTERACTIVE_HEIGHT);
     },
