@@ -565,42 +565,29 @@
         align: 'left',
         fontSize: 24,
         fill: 'white',
-        baseline:'top',
+        baseline: 'top',
+        stroke:false,
       })
       .setPosition(20, 60)
       .addChildTo(this);
       this.label.alpha = 0.3;
 
-      this.label.text = 'ver.' + VERSION + '\ndebug:' + this.debug + '\n' +
-          'just:' + this.just
-      + ',good:' + this.good
-      + ',bad:' + this.bad
-      + ',miss:' + this.miss
-      + '\nchange speed:cursor up↑ or down↓\nchange rotate cursor ← →';
+
       otoge.message = this;
-      this.label.on('enterframe', function() {
-        var s = new Date();
-        this._render();
-        !Math.randint(0,60)&&console.log(new Date - s);
-      });
-      var s = new Date();
-      this.label._render();
-      this.label._render();
-      this.label._render();
-      console.log(new Date - s);
+
 
       this.label.draw = null;
     },
 
 
-    //update: function (app) {
-    //  this.label.text ='ver.'+VERSION+'\ndebug:'+this.debug+'\n'+
-    //      'just:' + this.just
-    //  + ',good:' + this.good
-    //  + ',bad:' + this.bad
-    //  + ',miss:' + this.miss
-    //  + '\nchange speed:cursor up↑ or down↓\nchange rotate cursor ← →';
-    //}
+    update: function (app) {
+      this.label.text ='ver.'+VERSION+'\ndebug:'+this.debug+'\n'+
+          'just:' + this.just
+      + ',good:' + this.good
+      + ',bad:' + this.bad
+      + ',miss:' + this.miss
+      + '\nchange speed:cursor up↑ or down↓\nchange rotate cursor ← →';
+    }
 
 
   });
