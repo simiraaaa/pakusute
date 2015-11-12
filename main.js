@@ -45,7 +45,7 @@
   描画の更新はUPDATEで行う。
 
   */
-  var VERSION = '0.0.17';
+  var VERSION = '0.0.18';
 
   var SCREEN_WIDTH = 480;
   var SCREEN_HEIGHT = 320;
@@ -918,6 +918,7 @@
 
 
 
+
     init: function () {
       this.superInit();
       var self = this;
@@ -943,6 +944,7 @@
         keyup: this.__keyup,
         touchstart: this.__touchstart,
         touchend: this.__touchend,
+        touchcancel: this.__touchend,
       }.$forIn(function (k, v) {
         window.removeEventListener(k, v);
       });
@@ -983,6 +985,7 @@
       };
       app.domElement.addEventListener('touchstart', this.__touchstart);
       app.domElement.addEventListener('touchend', this.__touchend);
+      app.domElement.addEventListener('touchcancel', this.__touchend);
     },
 
 
