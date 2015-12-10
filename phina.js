@@ -8543,7 +8543,7 @@ phina.namespace(function() {
         backgroundColor: 'transparent',
 
         fill: 'black',
-        stroke: '#222',
+        stroke: false,
         strokeWidth: 2,
 
         // 
